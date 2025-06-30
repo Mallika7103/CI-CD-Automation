@@ -1,0 +1,8 @@
+yum install git -y 
+yum install docker -y
+systemctl start docker
+systemctl status docker
+amazon-linux-extras install java-openjdk11 -y
+yum install jenkins -y
+systemctl start jenkins
+chmod 777 ///var/run/docker.sock.
