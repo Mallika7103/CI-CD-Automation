@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    tools {
+        jdk 'jdk17'
+    }
+
+    environment {
+        SCANNER_HOME=tool 'mysonar'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git "https://github.com/devops0014/static-cycle-website-jenkins-docker-.git"
+            }
+        }
+        stage("Sonarqube Analysis") {
+            steps{
+                withSonarQubeEnv('mysonar') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=zomato \
+                    -Dsonar.projectKey=zomato '''
+                }
+            }
+        }
+        stage ("Build") {
+            steps {
+                sh 'docker build -t laharinalluridevops/kits:cycle .'
+            }
+        }
+        stage ("DockerHub") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker') {
+                       sh 'docker push laharinalluridevops/kits:cycle'
+                    }
+                }
+            }
+        }
+        stage ("Contianer") {
+            steps {
+                sh 'docker run -itd --name cont1 -p 1234:80 laharinalluridevops/kits:cycle'
+            }
+        }
+
+    }
+}
